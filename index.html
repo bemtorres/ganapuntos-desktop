@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fidelización SB - Aplicación de Escritorio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 600px;
+            padding: 2rem;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .status {
+            background: rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-text {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            display: none;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            display: none;
+            color: #ff6b6b;
+        }
+
+        .info {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">Fidelización SB</div>
+        <div class="subtitle">Aplicación de Escritorio</div>
+        
+        <div class="status" id="status">
+            <div class="status-icon">🔄</div>
+            <div class="status-text">Conectando con el servidor...</div>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <div>Cargando aplicación...</div>
+            </div>
+            <div class="error" id="error">
+                <div>❌ Error de conexión</div>
+                <div style="margin-top: 1rem; font-size: 0.9rem;">
+                    No se pudo conectar con el servidor. Verifique su conexión a internet.
+                </div>
+            </div>
+        </div>
+
+        <div class="buttons" id="buttons" style="display: none;">
+            <button class="btn btn-primary" onclick="retryConnection()">Reintentar Conexión</button>
+            <button class="btn btn-secondary" onclick="openInBrowser()">Abrir en Navegador</button>
+            <button class="btn btn-secondary" onclick="quitApp()">Cerrar Aplicación</button>
+        </div>
+
+        <div class="info">
+            <div>Versión 1.0.0</div>
+            <div>Desarrollado con Electron</div>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+    <script>
+        // Intentar cargar la aplicación principal
+        function loadMainApp() {
+            const targetUrl = 'https://fidelizacionsb.cl/access?token=123719872391872391723';
+            
+            // Mostrar loading
+            document.getElementById('loading').style.display = 'block';
+            document.querySelector('.status-text').textContent = 'Cargando aplicación...';
+            
+            // Simular verificación de conexión
+            setTimeout(() => {
+                // En una aplicación real, aquí verificarías la conectividad
+                const isOnline = navigator.onLine;
+                
+                if (isOnline) {
+                    // Si hay conexión, redirigir a la URL principal
+                    window.location.href = targetUrl;
+                } else {
+                    showError();
+                }
+            }, 2000);
+        }
+
+        function showError() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('buttons').style.display = 'flex';
+            document.querySelector('.status-icon').textContent = '❌';
+            document.querySelector('.status-text').textContent = 'Error de conexión';
+        }
+
+        function retryConnection() {
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('buttons').style.display = 'none';
+            document.querySelector('.status-icon').textContent = '🔄';
+            document.querySelector('.status-text').textContent = 'Reintentando conexión...';
+            loadMainApp();
+        }
+
+        function openInBrowser() {
+            const targetUrl = 'https://fidelizacionsb.cl/access?token=123719872391872391723';
+            if (window.electronAPI) {
+                window.electronAPI.openExternal(targetUrl);
+            } else {
+                window.open(targetUrl, '_blank');
+            }
+        }
+
+        function quitApp() {
+            if (window.electronAPI) {
+                window.electronAPI.quit();
+            } else {
+                window.close();
+            }
+        }
+
+        // Iniciar carga cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMainApp();
+        });
+
+        // Manejar cambios de conectividad
+        window.addEventListener('online', () => {
+            console.log('Conexión restaurada');
+            retryConnection();
+        });
+
+        window.addEventListener('offline', () => {
+            console.log('Conexión perdida');
+            showError();
+        });
+    </script>
+</body>
+</html> 

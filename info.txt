@@ -1,0 +1,8 @@
+
+
+Genera un proyecto en eletron que embebe esta pagina para poder usar en los pc y compila par windows
+
+https://fidelizacionsb.cl/access?token=123719872391872391723
+
+
+
